@@ -87,5 +87,5 @@ google_analytics: UA-86106436-1
 deploy:
   type: git
   repo: git@github.com:mikialex/blog.git
-  # branch: [branch] 
+  branch: master
   # message: [message]
