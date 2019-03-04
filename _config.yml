@@ -77,11 +77,11 @@ theme: edinburgh
 
 # Header
 menu:
-  About: /about
-  Contact: /contact
+  About: /about.html
+  GitHub: https://github.com/mikialex
 
 # Google Analytics Tracking ID
-google_analytics: UA-86106436-1
+google_analytics: UA-86106436-3
 
 
 deploy:
