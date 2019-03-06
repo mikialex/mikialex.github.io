@@ -27,7 +27,7 @@ vrscene不支持这样的特性，我认为是有一定原因的。vray以插件
 
 vrscene 本身场景格式易于解析，我调研了一些具体的文件，以及3dmax的api，最后的解决方案是，**直接在3dmax中解析vrscene，并使用相关api进行构建**。除此之外没有太多其他可行的做法。毕竟根据我们的需求，性能并不重要, 正确性只要基本满足就可以。
 
-正确性理论上是无法满足的，正如上文提到的，我举几个例子。3dmax的blendmaterial和vraymaterial导出的vrscene，plugin object 都是BRDFLayered，但是他们无论是用法和效果都有很大不同。又比如你画一个几何体，这时候3dmax里它是一个无材质的东西，不过在viewport里是有颜色的，这个无材质的东西导出却是有材质的BRDFDiffuse。。 所以很多东西事实上只能模拟。
+正确性理论上是无法满足的，正如上文提到的，我举几个例子。3dmax的blendmaterial和vraymaterial导出的vrscene，plugin object 都是BRDFLayered，但是他们无论是用法和效果都有很大不同。又比如你画一个几何体，这时候3dmax里它是一个无材质的东西，不过在viewport里是有颜色的，这个无材质的东西导出却是有材质的BRDFDiffuse。。 所以很多东西事实上只能模拟, 不必强求。
 
 ## 主要解析流程
 
