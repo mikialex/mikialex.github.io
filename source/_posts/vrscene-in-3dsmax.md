@@ -1,14 +1,13 @@
 ---
 title: Build 3dmax scene from vrscene
 date: 2019/3/6
-cover_image: ../images/vrscene-in-3dsmax/cover.png
 categories:
 - techology
 tags:
-- 3dsmax
+- 3dsmax, vrscene
 ---
 
-最近公司的业务需要将vrscene格式的文件导入到3dmax中。 3dsmax是广泛应用的建模软件， vrscene是 VRay 渲染器的场景描述文件，而 VRay 是当下最流行的离线渲染器。3dmax在安装了vray渲染器的插件之后，是支持vrsene文件的导入的，但是导入之后，在3dmax中是以vray的proxy形式存在，无法进行任何编辑操作。 根据vray的官方文档，vrscene仅仅是作为vray渲染器在不同建模平台进行数据交换的格式，并不支持反向导入到各个平台，形成可编辑的场景数据。我在maya上的测试结果也显示，vrscene是不支持反向导入成为可编辑数据的。而公司的业务要求后续的工作流需要vrscene的导入结果是正常的3dmax场景图对象，如何支持vrscene在3dmax中导入成可编辑对象，是我们主要讨论和解决的问题。
+最近因业务需求需要将vrscene格式的文件导入到3dmax中。 3dsmax是广泛应用的建模软件， vrscene是 VRay 渲染器的场景描述文件，而 VRay 是当下最流行的离线渲染器。3dmax在安装了vray渲染器的插件之后，是支持vrsene文件的导入的，但是导入之后，在3dmax中是以vray的proxy形式存在，无法进行任何编辑操作。 根据vray的官方文档，vrscene仅仅是作为vray渲染器在不同建模平台进行数据交换的格式，并不支持反向导入到各个平台，形成可编辑的场景数据。我在maya上的测试结果也显示，vrscene是不支持反向导入成为可编辑数据的。而公司的业务要求后续的工作流需要vrscene的导入结果是正常的3dmax场景图对象，如何支持vrscene在3dmax中导入成可编辑对象，是我们主要讨论和解决的问题。
 
 ## 关于vrscene格式
 
