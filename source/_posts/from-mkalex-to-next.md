@@ -1,5 +1,6 @@
 ---
 title: New clean land for posting
+date: 2019/3/4
 ---
 
 ## 关于 mkalex.com
@@ -16,3 +17,5 @@ title: New clean land for posting
 
 总之，算是一个全新的开始吧。 很多时候，过于追求强大和自由，但是自己真的需要吗，未必见得。我希望能把事情做的简单和纯粹，这也是我自认为智慧的生活信条。我也希望自己能够更加重视内容本身的产出，回归写作思考交流的本质。
 
+
+<img src="/images/from-mkalex-to-next/land.png" style="width: 100%">

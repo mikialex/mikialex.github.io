@@ -1,5 +1,11 @@
 ---
 title: Build 3dmax scene from vrscene
+date: 2019/3/6
+cover_image: ../images/vrscene-in-3dsmax/cover.png
+categories:
+- techology
+tags:
+- 3dsmax
 ---
 
 最近公司的业务需要将vrscene格式的文件导入到3dmax中。 3dsmax是广泛应用的建模软件， vrscene是 VRay 渲染器的场景描述文件，而 VRay 是当下最流行的离线渲染器。3dmax在安装了vray渲染器的插件之后，是支持vrsene文件的导入的，但是导入之后，在3dmax中是以vray的proxy形式存在，无法进行任何编辑操作。 根据vray的官方文档，vrscene仅仅是作为vray渲染器在不同建模平台进行数据交换的格式，并不支持反向导入到各个平台，形成可编辑的场景数据。我在maya上的测试结果也显示，vrscene是不支持反向导入成为可编辑数据的。而公司的业务要求后续的工作流需要vrscene的导入结果是正常的3dmax场景图对象，如何支持vrscene在3dmax中导入成可编辑对象，是我们主要讨论和解决的问题。
@@ -19,7 +25,9 @@ vrscene不支持这样的特性，我认为是有一定原因的。vray以插件
 
 ## 解决方案
 
-vrscene 本身场景格式易于解析，我调研了一些具体的文件，以及3dmax的api，最后的解决方案是，直接在3dmax中解析vrscene，并使用相关api进行构建。除此之外没有太多其他可行的做法。毕竟根据我们的需求，性能并不重要。
+vrscene 本身场景格式易于解析，我调研了一些具体的文件，以及3dmax的api，最后的解决方案是，**直接在3dmax中解析vrscene，并使用相关api进行构建**。除此之外没有太多其他可行的做法。毕竟根据我们的需求，性能并不重要, 正确性只要基本满足就可以。
+
+正确性理论上是无法满足的，正如上文提到的，我举几个例子。3dmax的blendmaterial和vraymaterial导出的vrscene，plugin object 都是BRDFLayered，但是他们无论是用法和效果都有很大不同。又比如你画一个几何体，这时候3dmax里它是一个无材质的东西，不过在viewport里是有颜色的，这个无材质的东西导出却是有材质的BRDFDiffuse。。 所以很多东西事实上只能模拟。
 
 ## 主要解析流程
 
