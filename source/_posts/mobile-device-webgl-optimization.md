@@ -1,5 +1,5 @@
 ---
-title: 移动设备 webgl 优化
+title: 移动设备 WebGL 优化
 date: 2018/11/17
 ---
 
