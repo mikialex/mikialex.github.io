@@ -202,7 +202,7 @@ def contour(tree, comp, level=0, cont=None):
 ### Threads
 
 
-<img src="/images/tree-drawing/figure7.png"></img>
+<img src="/images/tree-drawing/figure7.png">
 
 我们能够通过树轮廓的方法找到理想的右树偏移量。但是我们需要扫描子树来获得轮廓信息，使得算法退回到O(n^2)的效率。Reingold 和 Tilford 引入了一个新的概念叫 threads来解决这个问题（不是指多线程的threads）
 
