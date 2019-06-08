@@ -17,6 +17,7 @@ tags:
 
 <img src="/images/vrscene-in-3dsmax/hierachy.png" style="width: 80%">
 
+(2019/6/6补充： 后续支持了更多的plugin，比这个图复杂一倍。。)
 
 ## 为什么vrscene不支持导入成为可编辑对象?
 
