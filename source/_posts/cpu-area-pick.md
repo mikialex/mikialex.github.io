@@ -80,3 +80,6 @@ https://github.com/mrdoob/three.js/issues/1826
 https://github.com/vasturiano/react-force-graph/issues/43 2d的，简单，没有太多可比性
 
 http://output.jsbin.com/tamoce/3/  three的，实现不是很正确？
+
+https://community.khronos.org/t/intersecting-a-3d-segment-with-perspective-frustum/59537/3
+
