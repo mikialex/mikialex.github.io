@@ -29,11 +29,11 @@ QEM方法的原则：**就是合并后的这个顶点，应当到原先合并前
 
 相信讲到这里，网格简化问题已经被说透彻了。而QEM本质上只是解决上面这个问题的数学工具。
 
-对于一个三角面，其所在平面的方程有 `ax + by + cz + d = 0 where x^2 + y^2 + z^2 = 1`。不难记得高中的几何知识：对于这种平面方程, 空间中任意一点到这个平面的距离就是直接把xyz代入就是，那么距离的平方的函数就是 `d = (ax + by + cz + d)^2`。那么所有平面的距离平方和就是把所有三角面的这个函数相加就是。然后再求个最小值就ok了。
+对于一个三角面，其所在平面的方程有 `ax + by + cz + d = 0`。不难记得高中的几何知识：对于这种平面方程, 空间中任意一点到这个平面的距离就是直接把xyz代入就是，那么距离的平方的函数就是 `d = (ax + by + cz + d)^2`。那么所有平面的距离平方和就是把所有三角面的这个函数相加就是。然后再求个最小值就ok了。
 
 Quadric 在数学上叫[二次型](https://www.zhihu.com/question/38902714)。 `d = (ax + by + cz + d)^2`就是个二次型，所以我们就有展开后写成二次型矩阵的版本：
 
-[](/images/mesh-simplification/matrix.png)
+![](/images/mesh-simplification/matrix.png)
 
 一旦这么写了以后，我们原先的这些平方和的函数，就变成的一堆矩阵的和，所以，对于某个顶点周围的三角面，我们只要用这个二次型矩阵就能表达空间中任一点到这些三角面距离平方和的函数。而这个矩阵，就是这个顶点的QEM。而对于我们上面讲到的“到原先合并前两个顶点周围若干三角形所在平面的距离的平方和”，那就是两个顶点的QEM矩阵和。
 
@@ -41,7 +41,7 @@ Quadric 在数学上叫[二次型](https://www.zhihu.com/question/38902714)。 `
 
 不过在求最小值方面的确是不清楚不用二次型矩阵有什么更好的办法。
 
-[](/images/mesh-simplification/matrix2.png)
+![](/images/mesh-simplification/matrix2.png)
 
 我不是很懂矩阵的微积分, 这个求导的推导需要再看看其他资料。只不过这么搞答案立刻就有。
 
@@ -59,16 +59,16 @@ Quadric 在数学上叫[二次型](https://www.zhihu.com/question/38902714)。 `
 
 Paper
 
-https://www.cs.cmu.edu/~./garland/Papers/quadrics.pdf
+<https://www.cs.cmu.edu/~./garland/Papers/quadrics.pdf>
 
 开源参考实现：
 
-https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification/blob/master/src.cmd/Simplify.h
+<https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification/blob/master/src.cmd/Simplify.h>
 
-https://github.com/hhoppe/Mesh-processing-library/blob/master/MeshSimplify/MeshSimplify.cpp
+<https://github.com/hhoppe/Mesh-processing-library/blob/master/MeshSimplify/MeshSimplify.cpp>
 
 二次型，数学相关
 
-https://www.zhihu.com/question/38902714
+<https://www.zhihu.com/question/38902714>
 
-https://www.zhihu.com/question/22455493
+<https://www.zhihu.com/question/22455493>
