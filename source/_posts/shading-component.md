@@ -79,6 +79,7 @@ pub trait MVPTransformInput{
   fn position(&self) -> Node;
 }
 
+// deref into inner type
 impl MVPTransformInput for PositionAttributeInput<BaseShading>{
     fn position(&self) -> Node {
         todo!()
