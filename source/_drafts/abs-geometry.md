@@ -1,10 +1,8 @@
 # 使用Rust trait 抽象三维几何数据类型
 
-在对rust的trait， generics等概念有了一定理解后，我尝试集中编写一些三位几何数据的容器类作为渲染引擎的基础库。
+在对rust的trait， generics等概念有了一定理解后，我尝试集中编写一些三维几何数据的容器类作为渲染引擎的基础库。
 
-如果你对three.js比较了解的话，我这里做的，其实就是使用rust编写Geometry，BufferGeometry等容器类，同时支持一些简单的操作，比如有index的geometry 转化为无index的geometry，以及支持raycast。
-
-three的geometry写的是很挫的，寄希望于rust这门优秀的语言，我试图提升一下自我要求，比如：
+如果你对three.js比较了解的话，我这里做的，其实就是使用rust编写Geometry，BufferGeometry等容器类，three的geometry写的是很挫的，寄希望于rust这门优秀的语言，我试图提升一下自我要求，比如：
 
 * 尝试将拓扑信息编码在类型之中，这样假设我有一个描述以triangleList为布局的几何数据，不应该赋值给一个以trianglestrip为布局的几何数据。
 * 可以使用任何用户自定义的顶点数据结构
@@ -34,8 +32,8 @@ let my_geometry_data: Vec<Vertex>;
 ```rust
 pub struct VertexArray {
   pub position: Vec<Vec3<f32>>,
-  pub normal: Vec3<f32>,
-  pub uv: Vec2<f32>,
+  pub normal: Vec<Vec3<f32>>,
+  pub uv: Vec<Vec2<f32>>,
 }
 
 let my_geometry_data: VertexArray;
@@ -142,7 +140,7 @@ impl<T: Positioned3D> PrimitiveTopology<T> for TriangleStrip {
 
 ## 构造我们的几何类型
 
-数据结构和约束如下：
+Index和非Index版本的数据结构如下：
 
 ```rust
 pub struct IndexedGeometry<
