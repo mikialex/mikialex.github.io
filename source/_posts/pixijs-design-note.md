@@ -1,6 +1,6 @@
 ---
 title:  a glimpse of pixijs design
-date: 2018/1014
+date: 2018/10/14
 ---
 
 Pixi.js is a fast opensource html5 2d render engine. My company's product use it for rendering part of the 2d floor plan . I have knew pixi for a long time, but never thought it could be used in many varity purpose.  As I am quite familiar with the world most popular web3d rendering library three.js, maybe I should dig in about how to render 2d content on web effectively by reading the design and implementation of pixi.js.
