@@ -51,7 +51,7 @@ wasm的memcopy没有simd支持，相关标准可能还在设计，要比native�
 
 IO性能很差，千万别乱来。实践上还是走批处理的做法，获取指针位置/大小，从js侧建立数据的view，按布局直接批量直接读写，这个是最佳实践。其他要是小接口，或者没啥高频调用的，走wasm-bindgen也挺好。
 
-### Perfer struct of array
+### Prefer struct of array
 
 ### 了解编译原理，了解编译结果，了解底层
 
