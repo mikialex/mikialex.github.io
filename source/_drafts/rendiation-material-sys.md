@@ -14,9 +14,9 @@ Rendiation是我长期开发维护的一个图形渲染引擎，自去年年底1
 
 一个多维线性代数数学库，提供了Vector Matrix等相关数学类。
 
-其中的设计上最大的成就是实现了**数学库的维度泛型标记**，这使得**维数直接融合进数学计算的抽象中，使得使用者可以直接实现出高维度/任意维度的实现，或是对类型添加维数约束**，如果你还不能意识到这是多么酷的一点可以稍后看后文的例子。
+其中的设计上最大的成就是实现了**数学库的维度常量泛型标记**，这使得**维数直接融合进数学计算的抽象中，使得使用者可以直接实现出高维度/任意维度的实现，或是在实现中对类型约束添加维数约束**，如果你还不能意识到这是多么酷的一点可以稍后看后文的例子。
 
-在实现维度抽象这一特性上，依赖rust还未稳定的const generics和specialization特性，保守估计这两个特性三年之内都做不完，所以RRF将长期使用nightly版本编译器。
+在实现维度抽象这一特性上，依赖rust还未稳定的const generics和specialization特性，保守估计这两个特性三年之内都无法进入稳定版，所以RRF将长期使用nightly版本编译器。
 
 在实现维度抽象这一特性上， 我最早参考了[aljabar](https://github.com/maplant/aljabar)这个高维线代库的实现。但是最后放弃了它的做法，aljabar使用`[T; const N]`的array作为vector的容器，`[Vector<const N>; const N]`来作为matrix的容器，基本的针对n维的运算和操作都已实现，这并无不妥。但是因为算法是针对n维进行实现的，性能非常不理想，作者也表示会手工加入234维的特化实现，这也并无不妥。但是我实际自行加了一些特化的实现，和我当前的实现使用[criterion.rs](https://github.com/bheisler/criterion.rs)进行benchmark对比，结果依然在某些地方不理想。举一个差异较大的例子：aljabar的n维矩阵求逆使用的是LU分解，3维情况下时间消耗比直接的实现要慢30倍左右，我手工加入了直接做法的特化，但是性能也有数倍的差异。我判断原因可能基于array的数据结构在matrix这种case让编译器优化产生困难，或者disable了一些自动向量化的编译优化。我并不愿意为了这个抽象而牺牲性能，所以只能尝试其他的做法。
 
@@ -96,9 +96,9 @@ pub trait Vector<T: Scalar>:
 
 ####  math-entity
 
-math-entity主要是基于math的几何库。比如box，sphere，circle，ray，plane等等东西。
+math-entity主要是基于math的几何库。比如box，sphere，circle，ray，plane等等类似于空间中实体 (entity) 的东西。
 
-受益于math库的维度抽象能力。自然然而sphere和circle使用同一个数据结构：HyperSphere，box和rectangle使用的也是同一个数据结构：HyperAABB，line和plane：HyperPlane，无非只是维度的不同
+受益于math库的维度抽象能力。自然而然sphere和circle使用的是同一个数据结构：HyperSphere，box和rectangle使用的也是同一个数据结构：HyperAABB，line和plane：HyperPlane，无非只是维度的不同。
 
 ```rust
 pub struct HyperSphere<T: Scalar, const D: usize> {
@@ -192,35 +192,171 @@ pub trait IntersectAble<Target, Result, Parameter = ()> {
 
 构建与math及math entity之上的是render-entity。render-entity集合了若干常用于渲染引擎中的数据结构，目前只有相机，控制器组件，其他组件待补充
 
-另外颜色相关的实现也存在于此，颜色方面主要的特色是将色彩空间信息编码进类型中，可以避免错误的颜色计算。
+另外颜色相关的实现也存在于此，颜色方面主要的特色是将色彩空间信息编码进类型中，可以避免错误混淆不同颜色空间中的颜色计算，同时也能一更优美的方式编写色彩空间转化的实现。
 
 #### space-indexer
 
-空间加速数据结构，BVH，八叉树，四叉树，等。
+实现了若干空间加速/空间索引数据结构，BVH，八叉树，四叉树等。尽可能的提供优美，通用性高，性能卓越的实现。
+
+举例说：
+
+```rust
+// 例如八叉树和四叉树和二叉树共用了一个实现，只是维度不同
+pub type BinaryTree = BSTTree<Binary, 2, 1>;
+pub type QuadTree = BSTTree<Quad, 4, 2>;
+pub type OcTree = BSTTree<Oc, 8, 3>;
+
+...
+
+// 例如BVH内的Bounding可以是任意类型
+// 只要实现了以下约束，就可以直接生成以该类型为Bounding的BVH的Tree
+//（当然我这里做的还不够彻底，理论上维数也是可以抽象出来的
+pub trait BVHBounding:
+  Sized + Copy 
+  + FromIterator<Self> // 能够从一组自己中生成Union的Bounding
+  + CenterAblePrimitive // 能够获得自身的中心位置
+  + SolidEntity<f32, 3> // 自己是个三位封闭图形
+{
+  // 标记划分轴的类型
+  type AxisType: Copy;
+  // 获得最佳划分轴的方法
+  fn get_partition_axis(&self) -> Self::AxisType;
+}
+
+// 你也可以实现这个Trait 直接自己定义BVH的划分策略！
+pub trait BVHBuildStrategy<B: BVHBounding> {
+  fn build(
+    &mut self,
+    option: &TreeBuildOption,
+    build_source: &[BuildPrimitive<B>],
+    index_source: &mut Vec<usize>,
+    nodes: &mut Vec<FlattenBVHNode<B>>,
+    depth: usize,
+  ) -> usize {
+    ...
+  }
+
+  fn split(
+    &mut self,
+    parent_node: &FlattenBVHNode<B>,
+    build_source: &[BuildPrimitive<B>],
+    index_source: &mut Vec<usize>,
+  ) -> ((B, Range<usize>), B::AxisType, (B, Range<usize>));
+}
+
+```
+
+在后续会继续完成开发BSP， R tree，KdTree等数据结构的实现。并尝试在这些结构之上抽象出更加一般的空间相关算法。
 
 #### river-mesh
 
-可编辑mesh数据结构，这部分目前完成度很低。
+这部分目前完成度很低。这块主要想做一个可编辑mesh数据结构，类似于blender之类建模软件的几何部分。毕竟我能搞定渲染，我再搞定建模，我就可以自己进入一种无中生有的境界。。
 
-尝试使用unsafe代码提升性能，但是unsafe非常难写，非常容易写出UB
+主要是Half edge，后续会考虑做其他的数据结构，翼边什么的。
+
+当时实现是想尝试使用unsafe代码提升性能，但是unsafe非常难写，非常容易写出UB。rust对于unsafe代码有一套非常晦涩的是不是UB的原则，叫stack borrow，整个paper我就没有真的读下去，给我的感受是实现上真的太难了。在当时，我是知道有miri这个解释器可以检查unsafe代码UB的问题，但是那时候我还没有决心上nightly(miri只有nigtly有)，后续就直接搁置了。当然现在RRF已经是nightly编译了，这块我想还是可以拾起来继续做的。另一个想法是，即便不适用unsafe，通过合适的编程技巧，依然能够作出高性能的实现，所以可能后续会直接重写。
+
+这个仓库还躺了没写完的mesh QEM简模的实现，主要是想实践我另一篇介绍简模算法的文章，但是依赖于mesh数据结构，并未完成。
+
+#### mesh-buffer
+
+除了可编辑mesh，mesh的另一种，也可以说是最通用的表达方式是图元的buffer。即那些可以直接被图形API使用的数据。这个crate大量应用了泛型，定义了诸多这样的buffer容器，同时将图元的访问，遍历，抽象出具体的trait，并基于这些抽象，在这些容器上实现出了高性能的几何转化/射线求交/BVH等算法。除了基于容器的算法，还有一部分归类于tessellation的主题下，这部分是几何生成的工具。
+
+具体的实现可以参考我之前另一篇文章的介绍。但是我要指出的是：很遗憾那一篇文章已经过时了，很多抽象和实现都做了调整，不过这不影响对我做的事情本质上的描述。
 
 #### nozie
 
-噪声及生成式纹理库，完成度也很低。
+噪声及生成式纹理库，完成度也很低。目前只实现了两种最基本的噪声纹理，也并没有抽象上的设计。
+
+最早我在实现Minecraft的地形部分的时候，需要噪声纹理，那么我很快我就找到了社区的包并成功使用上了，但生成式纹理一直也是我很感兴趣的主题，所以这不妨碍我建立一个独立的crate来进行开发和研究。
+
+在将来，计划会有一个类似于mesh-buffer的crate，类比于mesh-buffer，提供贴图的容器/算法集合，而类比于tessellation的部分就是nozie。
 
 ### 跨平台渲染库：
 
 #### ral 跨平台渲染抽象层
 
+ral作为跨平台渲染抽象层，目的是解决跨平台渲染的问题，用户使用RAL而不是具体某个图形api可以实现跨平台能力，理论上通过重新编译，应用可以无缝迁移到其他平台进行渲染。
+
+这个库主要包含了三个内容：
+
+- 一套渲染相关描述符(例如贴图格式，drawmode格式)的中间格式。
+- 一个RAL Trait，用来对渲染进行抽象
+- 一个资源管理器的实现：ResourceManager<T: RAL>
+
+中间格式现在直接将
+
+RAL这个 trait，可以说是RRF目前最重要的trait了。
+
+```rust
+pub trait RAL: 'static + Sized {
+  type RenderTarget;
+  type RenderPass;
+  type Renderer;
+  type ShaderBuildSource;
+  type Shading;
+  type BindGroup;
+  type IndexBuffer;
+  type VertexBuffer;
+  type UniformBuffer;
+  type Texture;
+  type Sampler;
+
+  fn create_shading(renderer: &mut Self::Renderer, des: &Self::ShaderBuildSource) -> Self::Shading;
+  fn dispose_shading(renderer: &mut Self::Renderer, shading: Self::Shading);
+  fn apply_shading(pass: &mut Self::RenderPass, shading: &Self::Shading);
+  fn apply_bindgroup(pass: &mut Self::RenderPass, index: usize, bindgroup: &Self::BindGroup);
+
+  fn apply_vertex_buffer(pass: &mut Self::RenderPass, index: i32, vertex: &Self::VertexBuffer);
+  fn apply_index_buffer(pass: &mut Self::RenderPass, index: &Self::IndexBuffer);
+
+  fn create_uniform_buffer(renderer: &mut Self::Renderer, data: &[u8]) -> Self::UniformBuffer;
+  fn dispose_uniform_buffer(renderer: &mut Self::Renderer, uniform: Self::UniformBuffer);
+  fn update_uniform_buffer(
+    renderer: &mut Self::Renderer,
+    gpu: &mut Self::UniformBuffer,
+    data: &[u8],
+    range: Range<usize>,
+  );
+
+  fn create_index_buffer(renderer: &mut Self::Renderer, data: &[u8]) -> Self::IndexBuffer;
+  fn dispose_index_buffer(renderer: &mut Self::Renderer, buffer: Self::IndexBuffer);
+
+  fn create_vertex_buffer(
+    renderer: &mut Self::Renderer,
+    data: &[u8],
+    layout: VertexBufferDescriptor<'static>,
+  ) -> Self::VertexBuffer;
+  fn dispose_vertex_buffer(renderer: &mut Self::Renderer, buffer: Self::VertexBuffer);
+
+  fn set_viewport(pass: &mut Self::RenderPass, viewport: &Viewport);
+
+  fn draw_indexed(pass: &mut Self::RenderPass, topology: PrimitiveTopology, range: Range<u32>);
+  fn draw_none_indexed(pass: &mut Self::RenderPass, topology: PrimitiveTopology, range: Range<u32>);
+
+  fn render_drawcall(
+    drawcall: &Drawcall<Self>,
+    pass: &mut Self::RenderPass,
+    resources: &ResourceManager<Self>,
+  );
+}
+```
+
+和gfx-rs的定位差异：
+
+在设计和实现rrf ral的过程中，我并没有参考gfx-rs的实现。后来随着思考和实现的推进，我发现ral有完全朝gfx-rs转型的苗头。gfx这个项目是rust图形生态中元老级的核心项目，其抽象程度，实现的完备程度，是不可能超越的。所以后来我尝试赋予ral新的一个定位，新的理解：ral只做场景资源类型的抽象，不涉及到底层实现渲染的数据结构的抽象，举例说，RAL的关联类型中不会有Encoder，Queue等类型，至于实际绘制中，这些场景资源如何进行渲染，如何进行同步的细节完全由RAL的实现者完成。这个新的定位目前还在转型之中，所以现在的RAL的接口还会有变化。
+
 #### shadergraph 着色器链接框架
+
+#### derives
 
 #### webgl
 
-渲染抽象层的webgl实现
+渲染抽象层的webgl实现。主要是对webgl2的上层封装，使其实现RAL trait。实现的完整程度还是处于prototype的级别。
 
 #### webgpu
 
-渲染抽象层的webgpu实现
+渲染抽象层的webgpu实现。主要是对wgpu-rs的上层封装，使其实现RAL trait。实现的完整程度还是处于prototype的级别。
 
 ### 渲染框架层：
 
@@ -230,13 +366,15 @@ pub trait IntersectAble<Target, Result, Parameter = ()> {
 
 #### nyxt
 
-#### derives
-
 #### rendium
 
 ### 框架测试应用：
 
 #### rainray
+
+Yet another ray tracer. 
+
+纯CPU实现的光线跟踪渲染器。使用rayon进行多线程加速。支持多种几何图元/mesh进行渲染，
 
 #### rinecraft
 
@@ -287,6 +425,6 @@ pipeline layout descriptor类型的信息和shader内的信息是冗余的
 
 为什么使用流图，而不是AST？
 
-## 项目VI设计
+## 
 
 
