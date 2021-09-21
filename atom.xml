@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2021-04-05T12:42:25.635Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://mikialex.github.io/"/>
+  <updated>2021-09-21T08:30:52.346Z</updated>
+  <id>http://mikialex.github.io/</id>
   
   <author>
     <name>miki alex</name>
@@ -17,13 +17,34 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>编译原理入门之旅</title>
-    <link href="http://yoursite.com/2021/04/05/compiler101/"/>
-    <id>http://yoursite.com/2021/04/05/compiler101/</id>
-    <published>2021-04-04T16:00:00.000Z</published>
-    <updated>2021-04-05T12:42:25.635Z</updated>
+    <title>Native GUI research in 2021</title>
+    <link href="http://mikialex.github.io/2021/09/21/gui-2021/"/>
+    <id>http://mikialex.github.io/2021/09/21/gui-2021/</id>
+    <published>2021-09-20T16:00:00.000Z</published>
+    <updated>2021-09-21T08:30:52.346Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="背景：-为何学习编译原理"><a href="#背景：-为何学习编译原理" class="headerlink" title="背景： 为何学习编译原理"></a>背景： 为何学习编译原理</h3><p>在过去的两年内，无论是我在工作还是业余的开发内容，都和图形渲染引擎的材质系统紧密相关。材质系统/框架本质上由这么几个部分组成：如何抽象着色逻辑，如何以最高的性能完成数据从应用程序到GPU的提交和更新，以及相关的资源管理。其中第一个部分，如何描述着色逻辑，对于大部分引擎而言就是shader构造的相关问题，这其中的相关问题我认为如果不在编译技术上投入精力进行学习和研究则会导致一些技术实现上的瓶颈。</p><p>可能一些人认为问题仅限于拼接shader字符串，的确，最基本的需求是可以通过拼接字符串，或者通过纯字符串操作得以解决。但以下高级需求很难做到：跨平台/功能降级，运行时优化，逻辑/依赖 的 提取/融合等，这些功能要求我们需要实现以真实程序的视角，而不是字符串的视角看待shader。</p><h3 id="进展"><a href="#进展" class="headerlink" title="进展"></a>进展</h3><p>仓库地址位于：<a href="https://github.com/mikialex/rxsl。目前已经实现了从输入到一个线形IR的转化，其中分部实现了从原始输入经lexer得到tokenstream，再经" target="_blank" rel="noopener">https://github.com/mikialex/rxsl。目前已经实现了从输入到一个线形IR的转化，其中分部实现了从原始输入经lexer得到tokenstream，再经</a> parser得到ast tree，再经过irgenerator 得到 ir的完整流程。</p><p>我的参考书籍就是编译原理龙书，此书我2015年便已购得，当然后续没有深入看下去，很多细节都只了解了大概，只能说对知识的框架有个粗略的认识。阅读此类较为晦涩的技术类书籍，特别是完全没有人指导和讲解的情况下，是富有挑战性的经历。很多时候某一页内容没有真正理解，后续都很难推进下去，而某些概念又写的颇为精妙和概括，的确遇到了一些困难。</p><p>对于阅读这种高深的技术书籍遇到的这种看不懂，又找不到人问的问题，经过我的实践，一般可以这么缓解：1 大量搜索其他网上的资料，交叉参考各自说法，或者去合适的社区提问 。2强行反复看，强行反复理解，很可能就能看懂。3 找现成代码研究和调试实现辅助理解。</p><h3 id="一些认识和有趣之处"><a href="#一些认识和有趣之处" class="headerlink" title="一些认识和有趣之处"></a>一些认识和有趣之处</h3><p>我想，这个世界上已经有太多文章教你怎么写parser了，所以我不想展开具体的技术细节，而是谈谈其中我认为有所认识，有所自我突破之处。</p><p>除了龙书，我还想推荐另一部偏理论的书：《有限自动机理论》，这本书让我了解到一些更本质的理论，比如：正则语言可以被一个简单的状态转化图的自动机识别，这就是正则表达式的实现。上下文无关语言可以被一个简单的状态转化图加一个状态的栈识别，这就是parser。</p><p>所谓自顶向下递归下降LL parser，由函数调用完成状态图的状态转化，由整个调用栈表达状态栈。所谓自底向上LR parser，则其实是根据文法显式的生成状态图转化，和状态栈的转化。</p><p>LR基本不能手写，需要parsergenerator生成，解析能力较强。LL手写很方便，而且非常直观，重要的是易于做错误恢复和调试，一般LL完全够用了，LR可以实现一遍了解了解细节。LR parser还是比较难以理解的，我在去年用ts写过一个简单的LR的parser generator来学习简单LR parser的细节，但我现在基本上又把细节都忘记了。</p><p>LL需要想一下的是文法的左递归消除。对于编程语言而言，左递归在文法中是常见的，消除左递归有一套完备的理论做法，即对文法做一系列等价的改写，其解法在形式上会引入一项新的非终结符号，而通过对这一新的终结符号进行解析可以使得分词器继续消费下去，避免陷入无限递归之中。</p><p>运算符优先级和结合性：对于编程语言中的二元运算符，语言设计上基本上都是通过优先级和结合性进行去歧义化，实践上来说，优先级表现哪个parser先进行调用上，优先级越低的parser越先在上层调用，使得对应的节点位于最后产生的语法树上层，反之亦然。而结合性则反映在最后树产生的形状。我们是自左向右读取输入的，所以左结合的parser编写起来较为自然，而右结合的parser，由于运算符左侧是optional的，我目前的做法就是简单的保存状态进行回溯。优先级和结合性有另一种灵活parser实现叫pratt parser：<a href="https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html，这种做法比较高级，写法也很优雅。" target="_blank" rel="noopener">https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html，这种做法比较高级，写法也很优雅。</a></p><p>IR设计和生成方面目前还在学习阶段，在我的实现中，IR的指令集非常简陋，很多语法树的部分都还没有写完实现，这些需要后续推进。在IR生成方面，我遇到的当时比较难以理解的部分是生成纯goto的控制流/生成控制流图，其中尤其是逻辑运算符也会产生控制流的问题。实话说我真的把书上写的那几页用代码实现一边我才基本搞清了细节。</p><p>在这个问题上，本质就是生成正确的goto指令，即插入goto指令并goto到正确的位置，其中难点在于后者。在插入goto后，我们是不能确定goto位置的，而是需要等到我们真的开始为goto到的代码生成指令时才知道，也是这时才对之前未确定的goto指令进行回填（back patch）。代码的控制流可能会交汇，即多个goto指令的目标很可能是一个，所以在goto resolver的内部数据结构上，具有相同跳转目标的为解决goto是个list，生成器可以按需对list进行合并（merge），而回填也是基于list进行。对于任何一段代码/语法树上的结构，<em>我们对其进行代码生成使总是要获得其首行指令位置以及其中未解决的goto</em>，当然这两个都是optional的（不一定生成了指令，不一定有未解决的控制流），而如果有更外层的跳转，比如loop continue/break return，那么内部未解决的控制流会和这些保存在代码生成器上的未解决的goto进行合并，在loop/function结束时便可以正确进行回填。总之代码生成器在生成控制流代码时，基于上面的统一的return值，要做的无非是生成goto指令以及未确定的跳转目标，合并未确定的跳转目标，回填未确定的跳转目标。</p><p>但是，当考虑到布尔表达式隐含的逻辑控制流时，事实上意味着如果某个表达式是布尔值，那么遇到逻辑运算符时不仅要生成逻辑运算的指令，还要生成跳转的指令，而这意味着一个布尔值在运行时的true和false是两条不一样的控制流（goto目标），所以，为表达式生成上述的控制流跳转结果是，要额外抽象成枚举，即对于类型是布尔值的表达式，需要返回两条潜在的未解决控制流语句，以供后续代码生成进行正确的合并和回填。</p><h3 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h3><p>后续我会继续将ast的其他ir部分补全，然后实现一个简单的VM来对IR进行执行和测试，然后会调整IR到一个真正的控制流图的结构，并进行SSA化，然后生成spirv代码，再后续会学习一下优化方面的内容。听起来越来越有趣了</p>]]></content>
+    <content type="html"><![CDATA[<p>整理一些native GUI架构方面的想法。</p><h2 id="Motivation-amp-Wishlist"><a href="#Motivation-amp-Wishlist" class="headerlink" title="Motivation &amp; Wishlist"></a>Motivation &amp; Wishlist</h2><p>有点迷恋于客户端技术。（这里的客户端是指的广义的客户端，泛指用户能接触到的最终产品）。在RRF的开发中，缺少用户界面来帮助我验证调试某些功能，展示作出的一些东西，是件遗憾的事情。我并不想引入外部的框架来做这件事情，因为本身UI的开发也是对RRF整个graphics stack的不错的检验机会。</p><p>与此同时，我认为研究GUI如何impl from ground，可以让我对2d渲染，客户端架构有一些深刻的了解和学习的机会，所以一个新的宏伟的巨轮又出现在了项目计划之中</p><p>我理想中的native的gui架构需要满足以下特新，这些特性不可缺一，其重要性主要按照以下顺序排列：declarative（expressive），high performance（and effiency），composable（modularity）</p><h4 id="声明式编程"><a href="#声明式编程" class="headerlink" title="声明式编程"></a>声明式编程</h4><p>所谓declarative，就是诸多现代流行的框架核心提供的能力，也是众所周知的概念：用户通过声明式的代码，直接指出数据与界面之间的映射关系，由框架负责更新工作，由此避免大量繁琐的数据和视图手工同步实现，巨幅提升界面编写效率和维护性。相关的概念可以说是深入人心的，也是vue、react等框架成功之处。甚至可以确定的说，现在没有人会再去使用没有双向绑定支持的UI框架了。双向绑定的支持对于用户是否能高效的编写业务是至关重要的。</p><h4 id="关于性能"><a href="#关于性能" class="headerlink" title="关于性能"></a>关于性能</h4><p>这里我不仅提到了performance，还有个重要的观点是effiency。随着硬件的发展，事实上常见用户设备的图形能力能够吞吐非常大规模的UI图元显示，这意味着在整个UI管线的后端图形部分很可能并不需要复杂的增量/脏绘制实现，甚至某些情况<em>实现不佳</em>的增量绘制的cpu检查成本高过了暴力绘制的gpu实际成本。但是我的观点是我们不仅要performance，还要effiency。</p><p>依赖GPU的全量绘制能力，使得具体的客户端性能表现依赖于实际的图形硬件配置。缺乏增量绘制更新的能力，也意味着你无法为你的GUI提供一个软件实现的图形后端，意味着无法在低端机器，受限的环境，嵌入式系统等情形下正常工作。</p><p>另一方面，effiency意味着移动设备的续航能力。时间尺度下，假设没有必要的计算在GPU加速的情况下事实上不会有性能影响，但从空间角度/消耗的角度来看，依然是需要被优化的。做到完美的高性能增量更新是相当难做的，这对技术上提出了新的考验。</p><h4 id="模块化，可组合可扩展能力"><a href="#模块化，可组合可扩展能力" class="headerlink" title="模块化，可组合可扩展能力"></a>模块化，可组合可扩展能力</h4><p>举例而言：用户可以自行实现UI组件，比如某个定制化的panel。用户可以自行实现全局主题。用户可以通过底层api实现高度定制化的样式。用户自定义组件的更新优化逻辑。用户可以扩展底层api，添加扩展性功能。</p><h2 id="Prior-art-amp-Complexity"><a href="#Prior-art-amp-Complexity" class="headerlink" title="Prior art &amp; Complexity"></a>Prior art &amp; Complexity</h2><p>实现丰富复杂native的桌面程序非常困难，因为做的完善的话，事实上就是在实现浏览器。但这是不可能的。但浏览器是一个好的比喻，因为我们要解决的一些问题其实是差不多的。</p><p>简单而言，典型结构分为三层：</p><p>底层部分：需要搞定windowing：窗体管理，作为呈现的容器。基于这个容器做 输入：来自窗体或者设备的事件。和输出：UI渲染的结果。这一层需要完成windowing，events，presentation的跨平台封装（这些工作主要是调用操作系统的API），可以理解是一个类似提供shell的能力。具体实现细节可以简单也可以非常复杂，比如支持多窗体？子窗体？全屏？不同系统任务栏？系统内置的menu？drag and drop？多显示器？，dpi？文件选择（不会让上层实现自己画一个file explorer吧），奇怪的设备（游戏手柄）？系统提供的合成器（compositor）？硬件视频加速（是的这个和渲染没关系，是操作系统的api）？web支持？</p><p>视图层部分：提供一个界面的描述方式的视图数据结构view，接受底层的事件，转化成界面上逻辑的事件（比如这个按钮被点击了） 触发对应的业务逻辑回调。以及将view渲染到窗体上。这部分实现内部也会分为多层实现，最上层是设计一套描述view的API，一般来说是树结构，比如DOM tree，widget tree。这套tree描述了样式和结构方面的原始信息，第二层会根据这些信息计算layout，生成displaylist显示列表，其中可能会有大量的优化实现，大量的中间数据结构和缓存（比如额外的layout tree、render tree），第三层是渲染实现，会翻译displaylist成不同图形后端的GPU渲染命令并提交，同时实现纹理，字体，几何缓存，渲染调度，使用系统合成器等。这里每一层可以说内部由分了好几块，每一块都有海量的细节。</p><p>应用部分：构建和维护view：监听事件，触发业务逻辑，修改业务数据，再反向更新view。一般响应式框架也会构建于这一层完成自动的双向绑定工作。</p><p>在游戏开发领域，更多的会推崇另一种Immediate mode的架构方案，与之相对的上面这种则称之为retain mode。游戏中UI只是配角，因为优化UI的性能一般没有收益，而界面风格可能高度定制化，一个高度优化非常复杂，扩展能力差的view层就完全没有存在的价值，更重要的是不像web开发领域，view和应用部分没有成熟好用的双向绑定机制，所以不如没有view。immediate mode就是这种1 不在乎性能（每一帧几乎不缓存什么计算，暴力全刷，像画游戏一样画UI），2 full declarative（直接traverse 应用state生成渲染命令，由于是每一帧都绘制，事件处理的代码直接被封装进渲染里了）。非常适合并且容易集成在游戏引擎中。但是缺点也显而易见，因为stateless，比如复杂的animation，layout，这些功能难以实现（某些具有内部state的UI实现，其state还是需要交给业务，等于说上层还是要完成view的工作），因为stateless，所以优化很难搞（所谓优化本质是维护cache，增量计算，本质是由大量statecache来实现的）。</p><p>我个人并不认可纯粹的immediate mode这种方式， 结合我对重要性的考量，正如上述提到的缺点一样：对于高静态的应用，performance和efficiency方面的优化缺乏可控性，需要付出更多的实现成本，以至于引入partial的retain mode。同样的，immediate mode其实本质上和3d渲染引擎并无太大区别，对于高动态内容，也不失于是一种不错的view输出模式。所以，对于retain还是immediate之争，我真正推崇的是hybrid的方式，有机的吸收两种做法在不同场景下的可取之处，而不局限于教条。</p><p>GUI的底层支持是个复杂的事情，我不认为我们需要一个大而全的解决方案，一步到位像浏览器一样做一个巨大的runtime，而是可以将这个逐个的功能支持点独立成一个个可组合的crate，各取所需。在开发框架时也要充分考虑到这些部件的替换扩展能力。根据上述的分层架构，事实上结合rust现有的生态，搭建一个minial，但是扩展性不错的框架是可以做到的。</p><h2 id="CaseStudy-amp-Experiment"><a href="#CaseStudy-amp-Experiment" class="headerlink" title="CaseStudy &amp; Experiment"></a>CaseStudy &amp; Experiment</h2><p><a href="https://github.com/linebender/druid" target="_blank" rel="noopener">druid</a> 这个UI框架在rust的GUI社区生态方面还是有一定影响力，druid的作者就是xieditor的作者，在native ui，graphics方面研究非常深入。这个库我在去年年初还集中研究过一段时间，但当时看的不是很明白，但现在得益于技术的长进，可以说大致上是了解清楚了，我觉得他的视图层部分很有可取之处。</p><p>druid的核心在于widget这个trait，整个UI的view，就是一个实现了这个trait的数据结构，然后任意的widget都可通过combinator的模式组合起来形成新的widget。整个widget tree就是这么靠combinator套娃套起来的。</p><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pub</span> <span class="class"><span class="keyword">trait</span> <span class="title">Widget</span></span>&lt;T&gt; &#123;</span><br><span class="line">  <span class="comment">// 事件处理，可以自己触发自定义事件，修改应用数据</span></span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">event</span></span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, ctx: &amp;<span class="keyword">mut</span> EventCtx, event: &amp;Event, data: &amp;<span class="keyword">mut</span> T, env: &amp;Env);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 相当于react的一堆生命周期hook</span></span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">lifecycle</span></span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, ctx: &amp;<span class="keyword">mut</span> LifeCycleCtx, event: &amp;LifeCycle, data: &amp;T, env: &amp;Env);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 接受应用数据（T），更新自己的view</span></span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">update</span></span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, ctx: &amp;<span class="keyword">mut</span> UpdateCtx, old_data: &amp;T, data: &amp;T, env: &amp;Env);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现layout</span></span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">layout</span></span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, ctx: &amp;<span class="keyword">mut</span> LayoutCtx, bc: &amp;BoxConstraints, data: &amp;T, env: &amp;Env) -&gt; Size;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 实现渲染</span></span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">paint</span></span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, ctx: &amp;<span class="keyword">mut</span> PaintCtx, data: &amp;T, env: &amp;Env);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>举例来说，flex布局事实上就是实现了widget的数据结构<code>Vec&lt;dyn widget&gt;</code>,差不多主要是实现layout。然后其他的event/paint直接转发子节点的实现。某个事件处理器也是一个widget，只不过实现了event，其他的都是套娃转发的。</p><p>我认为这真是绝妙的设计！我愿意称之为combinator套娃式的架构。其实这就是RFP（reactive functional programing）或者RP的变种。</p><p>这套思想的核心就是定义面向数据流的最核心的抽象（trait）然后针对某个单独功能特性做实现，然后做一堆组合器的实现，最后通过组合器和原子化的功能，将你最后的实际需求组装起来。 比如Rx的事件流，promise，future，全都是这样的。RFP和GUI放在一起同样绝佳的解决了组合性方面的问题。</p><p>RFP不仅解决了架构上功能模块化和扩展的的问题。对于rust这门底层语言，用户有能力控制内存，组合器链接子节点的过程可以自由的选择dyn trait动态连接，或者是通过泛型静态连接。得益于rust如此的零开销抽象机制，用户可以通过控制这个来显式的优化每个组件实际最后的内存布局，以避免过度零散的组合导致额外的间接调用和缓存不友好情况。比如你通过RFP组合出了一个slider，可能下面有十几个小的widget，但是我可以保证这个slider在内存上是连续的，几十个函数调用最后编译出来只有几个，仿佛你手写了一个超级复杂的slider widget。</p><p>RFP还提供了另一块额外的性能优化能力。假设你的view逻辑是纯粹的RFP架构，纯粹到什么地步呢，某个子view是否要渲染，是通过特制实现if组件来控制，列表视图通过for组件实现，本质上你就是通过RFP定义了一个类似vue的模版，只不过是个编译期高度优化过的形式。同样的，正如同vue的模版设计对于vue的性能优化起到了很大的作用，对于我们来说就是logic，branching，looping，等控制流结构被encode到combinator的数据结构里了，而针对每一种数据结构，我们的combinator可以定制的实现优化行为，比如memo，caching，differing，这些combinator本质上就是用户数据state，或者input event的transformer，transform整个view的change到下一层的combinator，整个UI更新的增量架构实现完全就是做在这些transformer/combinator上的，第二点就是对于某些子view的片段是constant的，即便他们有更新的逻辑，但其实是不需要运行的，得益于编译期优化强大，这些代码大概率可以在编译期就被优化掉。</p><p>我认为最好的设计不应该限制用户编写代码的方式，或者说逼迫用户采用某种范式进行开发。模版式的做法虽然有相当可取之处，但像react一样通过自由的逻辑来生成视图也是可以被允许的，react使用了统一的view描述结构virtual dom和不可变数据结构（optional）来做增量更新，而我们认为view的数据结构不应该由框架控制，那么如何做增量式更新呢。druid给出的答案是必须依赖不可变数据结构，我觉得这个想法还是可以接受的。做增量的事情，我看是逃不了做diff，要减少diff的成本，要么对view的实现做规定/侵入式实现（RFP，virtual dom），要么对用户state做侵入式实现（immutable， reactive）。而甚至两边看场景都需要，因为如果小的state生成巨量的view，那肯定得diff state，如果大的state生成小的view，应该diff view。</p><p>除了diff，做自由式数据界面映射的增量实现还有个非常关键之处，如何解决move语义？比如你diff出change了，但是这个change本质是个move，如果不做任何处理，还是执行销毁重建流程，那么不仅浪费性能，还会触发不必要的生命周期。react和vue都通过key来确定子组件identity来执行move，我很确定我们的for/list组件也能实现。但如果是自由式数据界面映射呢？毕竟我们没有vdom。另外假设你有两个相同类型的子组件，条件渲染第一个并出现，如何自动move第二个组件而不全量更新，当然我很确定模版或者if的做法也不会有这个问题，因为条件渲染被体现在数据里了（第一个坑总归留着的）但如果是自由式数据界面映射呢？</p><p>这个问题的本质是通过调用函数来组合生成view的过程，缺乏函数调用点对view实例的映射信息，以至于无法在运行时通过缓存的view实例来判断是否是当前相同的view function调用产生的。解决这个问题一般需要编译器介入使得函数内能访问函数调用的元信息，而rust正好有个#[track_caller]的宏可以在某个函数内获得当前调用对调用点的unique信息，于是问题就被魔法般的解决了，另一个rust框架 moixe主要就是利用这个来做incremental的。</p><p>我真的非常喜欢druid作者对incremental ui的论述，甚至从big picture来看，所谓incremental就是优化的本质。UI framework从数据到界面的映射，中间历经结构化，样式，布局，动画，渲染，每一层都有每一层的数据结构，整个framework incremental就是实现一条无比复杂的增量数据流pipeline，让每一层都最小化更新成本。又比如实现编译器的增量编译，language server，也是input一个小的change，然后一路pipeline下去。所以我想应该会有一套增量计算的框架来共同抽象出这类优化问题，可能是提供类似一套immutable的数据和更新元语的东西，也不排除这些特性升级到语言的层面。我能看到一些研究，但是依然还不得要领。</p><p>对比druid的做法和proir art，driud view，appliation并没有空间上的强隔离，你可以看到用户数据是直接通过<code>Widget&lt;T&gt;</code> 直接注入进来的。我认为这个是正确的做法，减少一层indirect，提高了性能。直接反映了应用数据生成视图的思想，体现了应用数据在视图转化中的过程，非常干脆利落。而避免了传统retain mode UI 强行 MV分离 大量callback，引用到处指，各种indirect调用同步数据，编译器运行时根本无法作出良好的优化。而事实上传统的这种大量callback的做法在rust这种没有GC的语言里是非常痛苦的，非常不ergonomic。虽然空间上是一体的，但是从实现上，职责区分是清楚干净的。</p><h2 id="目前实践"><a href="#目前实践" class="headerlink" title="目前实践"></a>目前实践</h2><p>我的整体架构还是会使用druid style的reactive programing。但是允许无缝的接入一些freestyle的做法（比如即时模式）。目前已经可以绘制textbox和button等简单组件，但距离理想情况还有很大差距。</p><p>我也会尝试作出一些新的尝试，作出更加模块化的设计。比如incremental方面，layout，animation protocol，，这里边每一点都可以展开细说，如果有兴致我可能后续连载于此。</p><p>##</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;整理一些native GUI架构方面的想法。&lt;/p&gt;&lt;h2 id=&quot;Motivation-amp-Wishlist&quot;&gt;&lt;a href=&quot;#Motivation-amp-Wishlist&quot; class=&quot;headerlink&quot; title=&quot;Motivation &amp;amp; 
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>编译原理入门之旅</title>
+    <link href="http://mikialex.github.io/2021/04/05/compiler101/"/>
+    <id>http://mikialex.github.io/2021/04/05/compiler101/</id>
+    <published>2021-04-04T16:00:00.000Z</published>
+    <updated>2021-08-20T13:03:23.619Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景：-为何学习编译原理"><a href="#背景：-为何学习编译原理" class="headerlink" title="背景： 为何学习编译原理"></a>背景： 为何学习编译原理</h3><p>在过去的两年内，无论是我在工作还是业余的开发内容，都和图形渲染引擎的材质系统紧密相关。材质系统/框架本质上由这么几个部分组成：如何抽象着色逻辑，如何以最高的性能完成数据从应用程序到GPU的提交和更新，以及相关的资源管理。其中第一个部分，如何描述着色逻辑，对于大部分引擎而言就是shader构造的相关问题，这其中的相关问题我认为如果不在编译技术上投入精力进行学习和研究则会导致一些技术实现上的瓶颈。</p><p>可能一些人认为问题仅限于拼接shader字符串，的确，最基本的需求是可以通过拼接字符串，或者通过纯字符串操作得以解决。但以下高级需求很难做到：跨平台/功能降级，运行时优化，逻辑/依赖 的 提取/融合等，这些功能要求我们需要实现以真实程序的视角，而不是字符串的视角看待shader。</p><h3 id="进展"><a href="#进展" class="headerlink" title="进展"></a>进展</h3><p>仓库地址位于：<a href="https://github.com/mikialex/rxsl" target="_blank" rel="noopener">https://github.com/mikialex/rxsl</a>。目前已经实现了从输入到一个线形IR的转化，其中分部实现了从原始输入经lexer得到tokenstream，再经 parser得到ast tree，再经过irgenerator 得到 ir的完整流程。</p><p>我的参考书籍就是编译原理龙书，此书我2015年便已购得，当然后续没有深入看下去，很多细节都只了解了大概，只能说对知识的框架有个粗略的认识。阅读此类较为晦涩的技术类书籍，特别是完全没有人指导和讲解的情况下，是富有挑战性的经历。很多时候某一页内容没有真正理解，后续都很难推进下去，而某些概念又写的颇为精妙和概括，的确遇到了一些困难。</p><p>对于阅读这种高深的技术书籍遇到的这种看不懂，又找不到人问的问题，经过我的实践，一般可以这么缓解：1 大量搜索其他网上的资料，交叉参考各自说法，或者去合适的社区提问 。2强行反复看，强行反复理解，很可能就能看懂。3 找现成代码研究和调试实现辅助理解。</p><h3 id="一些认识和有趣之处"><a href="#一些认识和有趣之处" class="headerlink" title="一些认识和有趣之处"></a>一些认识和有趣之处</h3><p>我想，这个世界上已经有太多文章教你怎么写parser了，所以我不想展开具体的技术细节，而是谈谈其中我认为有所认识，有所自我突破之处。</p><p>除了龙书，我还想推荐另一部偏理论的书：《有限自动机理论》，这本书让我了解到一些更本质的理论，比如：正则语言可以被一个简单的状态转化图的自动机识别，这就是正则表达式的实现。上下文无关语言可以被一个简单的状态转化图加一个状态的栈识别，这就是parser。</p><p>所谓自顶向下递归下降LL parser，由函数调用完成状态图的状态转化，由整个调用栈表达状态栈。所谓自底向上LR parser，则其实是根据文法显式的生成状态图转化，和状态栈的转化。</p><p>LR基本不能手写，需要parsergenerator生成，解析能力较强。LL手写很方便，而且非常直观，重要的是易于做错误恢复和调试，一般LL完全够用了，LR可以实现一遍了解了解细节。LR parser还是比较难以理解的，我在去年用ts写过一个简单的LR的parser generator来学习简单LR parser的细节，但我现在基本上又把细节都忘记了。</p><p>LL需要想一下的是文法的左递归消除。对于编程语言而言，左递归在文法中是常见的，消除左递归有一套完备的理论做法，即对文法做一系列等价的改写，其解法在形式上会引入一项新的非终结符号，而通过对这一新的终结符号进行解析可以使得分词器继续消费下去，避免陷入无限递归之中。</p><p>运算符优先级和结合性：对于编程语言中的二元运算符，语言设计上基本上都是通过优先级和结合性进行去歧义化，实践上来说，优先级表现哪个parser先进行调用上，优先级越低的parser越先在上层调用，使得对应的节点位于最后产生的语法树上层，反之亦然。而结合性则反映在最后树产生的形状。我们是自左向右读取输入的，所以左结合的parser编写起来较为自然，而右结合的parser，由于运算符左侧是optional的，我目前的做法就是简单的保存状态进行回溯。优先级和结合性有另一种灵活parser实现叫pratt parser：<a href="https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html" target="_blank" rel="noopener">https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html</a>，这种做法比较高级，写法也很优雅。</p><p>IR设计和生成方面目前还在学习阶段，在我的实现中，IR的指令集非常简陋，很多语法树的部分都还没有写完实现，这些需要后续推进。在IR生成方面，我遇到的当时比较难以理解的部分是生成纯goto的控制流/生成控制流图，其中尤其是逻辑运算符也会产生控制流的问题。实话说我真的把书上写的那几页用代码实现一边我才基本搞清了细节。</p><p>在这个问题上，本质就是生成正确的goto指令，即插入goto指令并goto到正确的位置，其中难点在于后者。在插入goto后，我们是不能确定goto位置的，而是需要等到我们真的开始为goto到的代码生成指令时才知道，也是这时才对之前未确定的goto指令进行回填（back patch）。代码的控制流可能会交汇，即多个goto指令的目标很可能是一个，所以在goto resolver的内部数据结构上，具有相同跳转目标的为解决goto是个list，生成器可以按需对list进行合并（merge），而回填也是基于list进行。对于任何一段代码/语法树上的结构，<em>我们对其进行代码生成使总是要获得其首行指令位置以及其中未解决的goto</em>，当然这两个都是optional的（不一定生成了指令，不一定有未解决的控制流），而如果有更外层的跳转，比如loop continue/break return，那么内部未解决的控制流会和这些保存在代码生成器上的未解决的goto进行合并，在loop/function结束时便可以正确进行回填。总之代码生成器在生成控制流代码时，基于上面的统一的return值，要做的无非是生成goto指令以及未确定的跳转目标，合并未确定的跳转目标，回填未确定的跳转目标。</p><p>但是，当考虑到布尔表达式隐含的逻辑控制流时，事实上意味着如果某个表达式是布尔值，那么遇到逻辑运算符时不仅要生成逻辑运算的指令，还要生成跳转的指令，而这意味着一个布尔值在运行时的true和false是两条不一样的控制流（goto目标），所以，为表达式生成上述的控制流跳转结果是，要额外抽象成枚举，即对于类型是布尔值的表达式，需要返回两条潜在的未解决控制流语句，以供后续代码生成进行正确的合并和回填。</p><h3 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h3><p>后续我会继续将ast的其他ir部分补全，然后实现一个简单的VM来对IR进行执行和测试，然后会调整IR到一个真正的控制流图的结构，并进行SSA化，然后生成spirv代码，再后续会学习一下优化方面的内容。听起来越来越有趣了</p>]]></content>
     
     <summary type="html">
     
@@ -39,8 +60,8 @@
   
   <entry>
     <title>About Rust Programming Language</title>
-    <link href="http://yoursite.com/2021/02/16/about-rust/"/>
-    <id>http://yoursite.com/2021/02/16/about-rust/</id>
+    <link href="http://mikialex.github.io/2021/02/16/about-rust/"/>
+    <id>http://mikialex.github.io/2021/02/16/about-rust/</id>
     <published>2021-02-15T16:00:00.000Z</published>
     <updated>2021-02-19T07:45:25.907Z</updated>
     
@@ -60,8 +81,8 @@
   
   <entry>
     <title>高性能Rust wasm最佳实践</title>
-    <link href="http://yoursite.com/2020/11/21/high-perf-rust/"/>
-    <id>http://yoursite.com/2020/11/21/high-perf-rust/</id>
+    <link href="http://mikialex.github.io/2020/11/21/high-perf-rust/"/>
+    <id>http://mikialex.github.io/2020/11/21/high-perf-rust/</id>
     <published>2020-11-20T16:00:00.000Z</published>
     <updated>2020-11-20T18:23:32.374Z</updated>
     
@@ -81,8 +102,8 @@
   
   <entry>
     <title>ECS的一些理解</title>
-    <link href="http://yoursite.com/2020/08/25/ecs-2020/"/>
-    <id>http://yoursite.com/2020/08/25/ecs-2020/</id>
+    <link href="http://mikialex.github.io/2020/08/25/ecs-2020/"/>
+    <id>http://mikialex.github.io/2020/08/25/ecs-2020/</id>
     <published>2020-08-24T16:00:00.000Z</published>
     <updated>2020-09-09T11:39:37.903Z</updated>
     
@@ -102,8 +123,8 @@
   
   <entry>
     <title>使用Rust trait 抽象三维几何数据类型</title>
-    <link href="http://yoursite.com/2020/08/23/abs-geometry/"/>
-    <id>http://yoursite.com/2020/08/23/abs-geometry/</id>
+    <link href="http://mikialex.github.io/2020/08/23/abs-geometry/"/>
+    <id>http://mikialex.github.io/2020/08/23/abs-geometry/</id>
     <published>2020-08-22T16:00:00.000Z</published>
     <updated>2020-08-23T07:02:29.757Z</updated>
     
@@ -123,8 +144,8 @@
   
   <entry>
     <title>RenderGraph review</title>
-    <link href="http://yoursite.com/2020/08/14/render-graph-2020/"/>
-    <id>http://yoursite.com/2020/08/14/render-graph-2020/</id>
+    <link href="http://mikialex.github.io/2020/08/14/render-graph-2020/"/>
+    <id>http://mikialex.github.io/2020/08/14/render-graph-2020/</id>
     <published>2020-08-13T16:00:00.000Z</published>
     <updated>2020-09-09T11:45:01.077Z</updated>
     
@@ -144,8 +165,8 @@
   
   <entry>
     <title>跨平台着色组件实现思考</title>
-    <link href="http://yoursite.com/2020/06/25/shading-component/"/>
-    <id>http://yoursite.com/2020/06/25/shading-component/</id>
+    <link href="http://mikialex.github.io/2020/06/25/shading-component/"/>
+    <id>http://mikialex.github.io/2020/06/25/shading-component/</id>
     <published>2020-06-24T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.629Z</updated>
     
@@ -165,8 +186,8 @@
   
   <entry>
     <title>QEM 网格模型简化算法</title>
-    <link href="http://yoursite.com/2020/04/04/mesh-simplification/"/>
-    <id>http://yoursite.com/2020/04/04/mesh-simplification/</id>
+    <link href="http://mikialex.github.io/2020/04/04/mesh-simplification/"/>
+    <id>http://mikialex.github.io/2020/04/04/mesh-simplification/</id>
     <published>2020-04-03T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.628Z</updated>
     
@@ -186,8 +207,8 @@
   
   <entry>
     <title>Side project retro in 2019 and future plan</title>
-    <link href="http://yoursite.com/2019/12/28/side-project-in-2019/"/>
-    <id>http://yoursite.com/2019/12/28/side-project-in-2019/</id>
+    <link href="http://mikialex.github.io/2019/12/28/side-project-in-2019/"/>
+    <id>http://mikialex.github.io/2019/12/28/side-project-in-2019/</id>
     <published>2019-12-27T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.629Z</updated>
     
@@ -207,8 +228,8 @@
   
   <entry>
     <title>FBO reuse in artgl rendergraph</title>
-    <link href="http://yoursite.com/2019/08/11/fbo-reuse-in-rendergraph-artgl/"/>
-    <id>http://yoursite.com/2019/08/11/fbo-reuse-in-rendergraph-artgl/</id>
+    <link href="http://mikialex.github.io/2019/08/11/fbo-reuse-in-rendergraph-artgl/"/>
+    <id>http://mikialex.github.io/2019/08/11/fbo-reuse-in-rendergraph-artgl/</id>
     <published>2019-08-10T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.627Z</updated>
     
@@ -228,8 +249,8 @@
   
   <entry>
     <title>Uniform upload optimization and UBO support in Artgl</title>
-    <link href="http://yoursite.com/2019/08/03/uniform-upload-design/"/>
-    <id>http://yoursite.com/2019/08/03/uniform-upload-design/</id>
+    <link href="http://mikialex.github.io/2019/08/03/uniform-upload-design/"/>
+    <id>http://mikialex.github.io/2019/08/03/uniform-upload-design/</id>
     <published>2019-08-02T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.630Z</updated>
     
@@ -249,8 +270,8 @@
   
   <entry>
     <title>Graph based shader source management in artgl</title>
-    <link href="http://yoursite.com/2019/07/16/graph-based-shadersource-management/"/>
-    <id>http://yoursite.com/2019/07/16/graph-based-shadersource-management/</id>
+    <link href="http://mikialex.github.io/2019/07/16/graph-based-shadersource-management/"/>
+    <id>http://mikialex.github.io/2019/07/16/graph-based-shadersource-management/</id>
     <published>2019-07-15T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.628Z</updated>
     
@@ -270,8 +291,8 @@
   
   <entry>
     <title>开源项目的思考</title>
-    <link href="http://yoursite.com/2019/07/07/opensource2019/"/>
-    <id>http://yoursite.com/2019/07/07/opensource2019/</id>
+    <link href="http://mikialex.github.io/2019/07/07/opensource2019/"/>
+    <id>http://mikialex.github.io/2019/07/07/opensource2019/</id>
     <published>2019-07-06T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.629Z</updated>
     
@@ -291,8 +312,8 @@
   
   <entry>
     <title>设计工具的框选实现</title>
-    <link href="http://yoursite.com/2019/06/04/cpu-area-pick/"/>
-    <id>http://yoursite.com/2019/06/04/cpu-area-pick/</id>
+    <link href="http://mikialex.github.io/2019/06/04/cpu-area-pick/"/>
+    <id>http://mikialex.github.io/2019/06/04/cpu-area-pick/</id>
     <published>2019-06-03T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.627Z</updated>
     
@@ -312,8 +333,8 @@
   
   <entry>
     <title>WebAssembly 3D 场景树加速原型验证</title>
-    <link href="http://yoursite.com/2019/04/30/wasm-scene/"/>
-    <id>http://yoursite.com/2019/04/30/wasm-scene/</id>
+    <link href="http://mikialex.github.io/2019/04/30/wasm-scene/"/>
+    <id>http://mikialex.github.io/2019/04/30/wasm-scene/</id>
     <published>2019-04-29T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.631Z</updated>
     
@@ -333,8 +354,8 @@
   
   <entry>
     <title>WebAssembly零拷贝批量数据交换和计算</title>
-    <link href="http://yoursite.com/2019/03/28/wasm-memory-as-data-container/"/>
-    <id>http://yoursite.com/2019/03/28/wasm-memory-as-data-container/</id>
+    <link href="http://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/"/>
+    <id>http://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/</id>
     <published>2019-03-27T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.630Z</updated>
     
@@ -354,8 +375,8 @@
   
   <entry>
     <title>Artgl，a webgl framework</title>
-    <link href="http://yoursite.com/2019/03/12/artgl-about/"/>
-    <id>http://yoursite.com/2019/03/12/artgl-about/</id>
+    <link href="http://mikialex.github.io/2019/03/12/artgl-about/"/>
+    <id>http://mikialex.github.io/2019/03/12/artgl-about/</id>
     <published>2019-03-11T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.626Z</updated>
     
@@ -375,8 +396,8 @@
   
   <entry>
     <title>台湾之旅</title>
-    <link href="http://yoursite.com/2019/03/10/taiwan-travel-first/"/>
-    <id>http://yoursite.com/2019/03/10/taiwan-travel-first/</id>
+    <link href="http://mikialex.github.io/2019/03/10/taiwan-travel-first/"/>
+    <id>http://mikialex.github.io/2019/03/10/taiwan-travel-first/</id>
     <published>2019-03-09T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.629Z</updated>
     
@@ -396,8 +417,8 @@
   
   <entry>
     <title>Build 3dmax scene from vrscene</title>
-    <link href="http://yoursite.com/2019/03/06/vrscene-in-3dsmax/"/>
-    <id>http://yoursite.com/2019/03/06/vrscene-in-3dsmax/</id>
+    <link href="http://mikialex.github.io/2019/03/06/vrscene-in-3dsmax/"/>
+    <id>http://mikialex.github.io/2019/03/06/vrscene-in-3dsmax/</id>
     <published>2019-03-05T16:00:00.000Z</published>
     <updated>2020-08-23T07:00:50.630Z</updated>
     
@@ -412,31 +433,10 @@
     
     </summary>
     
-      <category term="techology" scheme="http://yoursite.com/categories/techology/"/>
+      <category term="techology" scheme="http://mikialex.github.io/categories/techology/"/>
     
     
-      <category term="3dsmax, vrscene" scheme="http://yoursite.com/tags/3dsmax-vrscene/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>New clean land for posting</title>
-    <link href="http://yoursite.com/2019/03/04/from-mkalex-to-next/"/>
-    <id>http://yoursite.com/2019/03/04/from-mkalex-to-next/</id>
-    <published>2019-03-03T16:00:00.000Z</published>
-    <updated>2020-08-23T07:00:50.627Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="关于-mkalex-com"><a href="#关于-mkalex-com" class="headerlink" title="关于 mkalex.com"></a>关于 mkalex.com</h2><p>认识我的朋友可能知道我有一个个人网站 mkalex.com， 今天我决定将不再维护该站点的开发迭代，包括内容的更新。原有的内容将在后续几月经过筛选迁移于此，很遗憾部分内容将不再公开。 mkalex.com的域名目前将暂时不迁移使用。</p><p>这么做出于这么一些因素考虑： 原有的站点主要是一个基于 Vue 的 SPA 应用 (<a href="https://github.com/mikialex/mkalex-spa" target="_blank" rel="noopener">mkalex-spa</a>)， 前后端分离， 后端使用nodejs， 数据持久化在mysql中 ((<a href="https://github.com/mikialex/mkalex-rest-backend" target="_blank" rel="noopener">mkalex-rest-backend</a>))。这些都是我在业余时间实现并开源的，样式和交互精心设计，称得上作品。 放弃原有的站点主要是因为维护的时间精力成本较大，我其实并不需要一个完整的带后端的动态网站， 原有的站点完全没有利用到后端的特性，甚至连一个评论系统都没有实现，而没有实现的原因是我的业余时间实在有限，我也不想在宝贵的业余时间里写一些枯燥的 CURD，不仅没有什么乐趣，也没有太大价值。 原有的站点，较为复杂的部分不是提供给用户的前端，而是写给自己的管理端，实话说这部分做的并不令人满意，而这部分的开发和设计都多有欠缺，要是做好，需要投入更大的经历。 在过去一年中，我有很多好的想法，好的idea， 很多想尝试的原型，都需要业余时间，而时间不可能再被分给 CURD 上了。 所以 我一直在考虑将站点的架构更改为纯静态的形式，不仅能够大大减少代码维护的心智负担，也能让我把时间投入到更多有趣的事情上，毕竟我已经不会看到自己写的开发的东西出现在互联网上而感到兴奋了。</p><p>其二的原因， 除了开发的心智负担就是运维心智负担，静态的server真的省心太多了，随便什么地方都可以轻松部署。 比起在数据库里的文章，我更觉得躺在磁盘上的文件更有安全感和可读性可操作性。并不是折腾不来，总之就是懒得折腾吧。 其三的原因还在于，由于使用了 SPA 的模式，所以 SEO 就完全不复存在了，我觉得有些东西写出来，给自己看其实意义不大，我还是希望更多人能够看到，特别是技术方面的，能够帮助到一些，交流一些，认识一些朋友。 当然，我也考虑说整体迁移到nuxt， 做同构渲染，但是依然是原因1，没有太大精力和推动力做这件事情。</p><p>其四的原因，是国内备案的繁琐和不快。这就是除了技术之外的另一个麻烦之处了，工信部的备案我很早就做了，手续还不算太过麻烦，体验还不算差。但前两个月，阿里云突然告诉我说要去做上海公安局的备案，然后去一个什么网一搞搞很久，那个破网站竟然还是使用同步的ajax请求，这种垃圾是如何上线来祸害我们这些开发者呢？然后很搞笑的是，还要让我提供最高权限的管理员账户来做审核。 我是真的有点被国内的网络环境所恶心到了，我也不想再国内搞下去了，索性整站静态化，迁到github page上算了。 于是就有了现在你所看到的 new clean land。</p><h2 id="New-clean-land-for-posting"><a href="#New-clean-land-for-posting" class="headerlink" title="New clean land for posting"></a>New clean land for posting</h2><p>总之，算是一个全新的开始吧。 很多时候，过于追求强大和自由，但是自己真的需要吗，未必见得。我希望能把事情做的简单和纯粹，这也是我自认为智慧的生活信条。我也希望自己能够更加重视内容本身的产出，回归写作思考交流的本质。</p><p><img src="/images/from-mkalex-to-next/land.png" style="width:100%"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;关于-mkalex-com&quot;&gt;&lt;a href=&quot;#关于-mkalex-com&quot; class=&quot;headerlink&quot; title=&quot;关于 mkalex.com&quot;&gt;&lt;/a&gt;关于 mkalex.com&lt;/h2&gt;&lt;p&gt;认识我的朋友可能知道我有一个个人网站 mkalex.
-      
-    
-    </summary>
-    
+      <category term="3dsmax, vrscene" scheme="http://mikialex.github.io/tags/3dsmax-vrscene/"/>
     
   </entry>
   
